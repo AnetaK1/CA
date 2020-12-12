@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<GridPane fx:id="gridPane" alignment="center" hgap="10" prefHeight="800.0" prefWidth="800.0" vgap="10" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+   <children>
+      <Pane fx:id="Pane" prefHeight="768.0" prefWidth="753.0">
+         <children>
+            <ChoiceBox fx:id="BC" layoutX="14.0" layoutY="31.0" prefWidth="150.0" />
+            <ChoiceBox fx:id="type" layoutX="185.0" layoutY="31.0" prefWidth="150.0" />
+            <Label layoutX="37.0" layoutY="14.0" text="Boundary condition" />
+            <Label layoutX="247.0" layoutY="14.0" text="Type" />
+            <TextField fx:id="w" layoutX="362.0" layoutY="31.0" prefHeight="25.0" prefWidth="70.0" />
+            <TextField fx:id="h" layoutX="362.0" layoutY="87.0" prefHeight="25.0" prefWidth="70.0" />
+            <Label layoutX="381.0" layoutY="14.0" text="Width" />
+            <Label layoutX="379.0" layoutY="66.0" text="Height" />
+            <TextField fx:id="rowAmount" layoutX="466.0" layoutY="43.0" prefHeight="25.0" prefWidth="53.0" text="10" />
+            <Label layoutX="466.0" layoutY="4.0" prefHeight="17.0" prefWidth="53.0" text="Amount">
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+            <Label layoutX="481.0" layoutY="27.0" text="row " />
+            <Label layoutX="542.0" layoutY="27.0" text="column" />
+            <TextField fx:id="columnAmount" layoutX="535.0" layoutY="43.0" prefHeight="25.0" prefWidth="53.0" text="10" />
+            <TextField fx:id="radius" layoutX="493.0" layoutY="87.0" prefHeight="25.0" prefWidth="70.0" text="5" />
+            <Label layoutX="517.0" layoutY="66.0" text="Radius" />
+            <Button fx:id="start" layoutX="343.0" layoutY="131.0" mnemonicParsing="false" onAction="#begin" prefHeight="25.0" prefWidth="238.0" text="Start" />
+            <TextField fx:id="amount" layoutX="524.0" layoutY="1.0" prefHeight="25.0" prefWidth="64.0" />
+            <ScrollPane fx:id="scroll" layoutX="6.0" layoutY="171.0" prefHeight="419.0" prefWidth="603.0">
+               <content>
+                  <Canvas fx:id="matrix" height="419.0" width="641.0" />
+               </content>
+            </ScrollPane>
+            <ChoiceBox fx:id="squareSize" layoutX="260.0" layoutY="87.0" prefHeight="25.0" prefWidth="70.0" />
+            <Label layoutX="281.0" layoutY="66.0" text="Size" />
+            <ChoiceBox fx:id="neighbourhood" layoutX="14.0" layoutY="87.0" prefWidth="150.0" />
+            <Label layoutX="47.0" layoutY="66.0" text="Neighbourhood" />
+            <Button fx:id="step" layoutX="25.0" layoutY="131.0" mnemonicParsing="false" onAction="#StartGrowth" text="One step" />
+            <Button fx:id="Allgrowth" layoutX="172.0" layoutY="131.0" mnemonicParsing="false" onAction="#Growth" prefHeight="25.0" prefWidth="85.0" text="Growth" />
+         </children>
+      </Pane>
+   </children>
+   <columnConstraints>
+      <ColumnConstraints />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints />
+   </rowConstraints>
+</GridPane>
