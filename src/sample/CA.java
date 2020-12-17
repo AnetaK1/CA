@@ -18,6 +18,8 @@ public class CA {
     Random r = new Random();
     boolean choiceHeksa;
     int choicePenta ;
+    final double k = 0.1;
+    final double t = -6;
 
 
     public CA() {
@@ -73,29 +75,44 @@ public class CA {
 
     }
 
-    void buildWithRadius(int amount, int radius){
+    void buildWithRadius(int amount, int radius) {
+
+        int l = 1;
+        boolean can = true;
+
+        int possibleAmount;
+        if(width>height) possibleAmount = height/(2*radius);
+        else possibleAmount = width/(2*radius);
+        // int possibleAmount = width/(2*radius);
+
+        //    System.out.println(possibleAmount);
+
+        while (l <= amount && l<=possibleAmount) {
+            int x = (r.nextInt(height-2 )+1);
+            int y = (r.nextInt(width-2)+1);
+
+            //  System.out.println("Y: "+x+"\nX: "+y);
 
 
-
-        int l =1;
-
-
-        loops:
-             for(int i = radius; i < this.height-1; i+=2*radius){
-
-                for(int j = radius; j < this.width-1; j+=2*radius){
-
-
-
-                            matrix[i][j].setState(l);
-                            matrix[i][j].setCellColor(generateColor());
-                            if(l==amount) break loops;
-                            l++;
+            for (int i = 1; i < height-1; i++) {
+                for (int j = 1; j < width-1; j++) {
+                    double dist =matrix[x][y].getDistance(i,j);
+                    if(dist < radius && matrix[i][j].getState()!=0){
+                        can = false;
                     }
+
                 }
+            }
+            if(can){
+                if(matrix[x][y].getState()==0){
+                    matrix[x][y] = new Cell(l,x,y,generateColor());
+                    l++;
+
+                }
+            }
+
+        }
     }
-
-
 
 
 
@@ -124,17 +141,17 @@ public class CA {
         for(int i = 0; i < (height); i++){
             for(int j = 0; j < (width); j++){
 
-               if( i == 0 && j > 0 && j < (width-2)){
-                   matrix[i][j] = matrix[height-2][j];
-               }
+                if( i == 0 && j > 0 && j < (width-2)){
+                    matrix[i][j] = matrix[height-2][j];
+                }
 
-               if(i == (height-1) && j > 0 && j < (width-2)){
-                   matrix[i][j] = matrix[1][j];
-               }
+                if(i == (height-1) && j > 0 && j < (width-2)){
+                    matrix[i][j] = matrix[1][j];
+                }
 
-               if(j == 0 && i>0 && i <(height-2)){
-                   matrix[i][j] = matrix[i][width -2];
-               }
+                if(j == 0 && i>0 && i <(height-2)){
+                    matrix[i][j] = matrix[i][width -2];
+                }
                 if(j == (width-1) && i>0 && i <(height-2)){
                     matrix[i][j] = matrix[i][1];
                 }
@@ -239,15 +256,14 @@ public class CA {
 
                 if ( j < 0 || j > width - 1) continue;
 
-                if(matrix[i][j].getState() != 0){
+                if(matrix[i][j].getState() != 0 ){
                     neighbours.add(new Cell(matrix[i][j].getState(), matrix[i][j].getX(),
-                                     matrix[i][j].getY(), matrix[i][j].getCellColor()));
+                            matrix[i][j].getY(), matrix[i][j].getCellColor()));
                 }
 
             }
         }
-        // szukam których komórek o tym samym id jest najwięcej
-        // jeśli jest taka sama ilość wybieram w sposób losowy
+
 
         return neighbours;
 
@@ -373,24 +389,24 @@ public class CA {
         List<Cell> neighbours = new ArrayList<>();
 
         //int choicePenta = r.nextInt(4);
-      //  System.out.println(choicePenta);
+        //  System.out.println(choicePenta);
 
         switch (choicePenta){
             case 0:
                 neighbours = pentagonalDown(x,y);
-               // System.out.println(PentagonalDown);
+                // System.out.println(PentagonalDown);
                 break;
             case 1:
                 neighbours = pentagonalLeft(x, y);
-               // System.out.println(PentagonalLeft);
+                // System.out.println(PentagonalLeft);
                 break;
             case 2:
                 neighbours = pentagonalRight(x,y);
-              //  System.out.println(PentagonalRight);
+                //  System.out.println(PentagonalRight);
                 break;
             case 3:
                 neighbours = pentagonalUp(x,y);
-               // System.out.println(PentagonalUp);
+                // System.out.println(PentagonalUp);
                 break;
             default:
                 System.out.println("Wrong choice!!!");
@@ -442,8 +458,9 @@ public class CA {
 
                 if((j == y+1 && i == x-1) || (j == y-1 && i == x+1)) continue;
                 if(matrix[i][j].getState() != 0){
-                    neighbours.add(new Cell(matrix[i][j].getState(), matrix[i][j].getX(),
-                            matrix[i][j].getY(), matrix[i][j].getCellColor()));
+                    neighbours.add(matrix[i][j]);
+//                    neighbours.add(new Cell(matrix[i][j].getState(), matrix[i][j].getX(),
+//                            matrix[i][j].getY(), matrix[i][j].getCellColor()));
                 }
 
             }
@@ -458,12 +475,12 @@ public class CA {
     public List<Cell> heksagonalRandom(int x, int y){
         List<Cell> neighbours = new ArrayList<>();
 
-       // boolean choiceHeksa = r.nextBoolean();
+        // boolean choiceHeksa = r.nextBoolean();
         if(choiceHeksa){
             //System.out.println(HeksagonalRight);
             neighbours = hekasgonalRight(x,y);}
         else {
-           // System.out.println(HeksagonalLeft);
+            // System.out.println(HeksagonalLeft);
             neighbours = heksagonalLeft(x, y);
         }
 
@@ -537,6 +554,103 @@ public class CA {
 
     }
 
+    ////////////////////////////////////////////////
+    public List<Cell> MCMoore(int x, int y){
+
+        List<Cell> neighbours = new ArrayList<>();
+        if((x-1)>=0 && matrix[x-1][y].getState()!=0) neighbours.add(new Cell(matrix[x-1][y].getState(),x-1,y,matrix[x-1][y].getCellColor()));
+        if((x+1)<height && matrix[x+1][y].getState()!=0) neighbours.add(new Cell(matrix[x+1][y].getState(),x+1,y,matrix[x+1][y].getCellColor()));
+        if((y-1)>=0 && matrix[x][y-1].getState()!=0) neighbours.add(new Cell(matrix[x][y-1].getState(),x,y-1,matrix[x][y-1].getCellColor()));
+        if((y+1)<width && matrix[x][y+1].getState()!=0) neighbours.add(new Cell(matrix[x][y+1].getState(),x,y+1,matrix[x][y+1].getCellColor()));
+
+        if((x-1)>=0 && (y-1)>=0 && matrix[x-1][y-1].getState()!=0)neighbours.add(new Cell(matrix[x-1][y-1].getState(),x-1,y-1,matrix[x-1][y-1].getCellColor()));
+        if((x-1)>=0 && (y+1)<width && matrix[x-1][y+1].getState()!=0)neighbours.add(new Cell(matrix[x-1][y+1].getState(),x-1,y+1,matrix[x-1][y+1].getCellColor()));
+        if((x+1)<height && (y-1)>=0 && matrix[x+1][y-1].getState()!=0)neighbours.add(new Cell(matrix[x+1][y-1].getState(),x+1,y-1,matrix[x+1][y-1].getCellColor()));
+        if((x+1)<height && (y+1)<width && matrix[x+1][y+1].getState()!=0)neighbours.add(new Cell(matrix[x+1][y+1].getState(),x+1,y+1,matrix[x+1][y+1].getCellColor()));
+
+        return neighbours;
+
+    }
+    //////////////////////////////////////
+    //Monte Carlo
+    public void MonteCarlo(){
+
+        Cell[][] tempboard = new Cell[this.height][this.width];
+        for(int i = 0; i < (this.height); i++){
+            for(int j = 0; j < (this.width); j++){
+                tempboard[i][j] =  matrix[i][j] ;
+            }
+        }
+        //tworzę listę wszystkich komórek
+        List<Cell> listAllCells = new ArrayList<>();
+        for(int i=0;i<height;i++){
+            for(int j=0;j<width;j++){
+                listAllCells.add(matrix[i][j]);
+            }
+        }
+
+        for(int i=0;i<listAllCells.size();i++){
+
+            int find = r.nextInt(listAllCells.size());
+
+
+            int x = listAllCells.get(find).getX();
+            int y = listAllCells.get(find).getY();
+
+            Cell shot = matrix[x][y];
+            List<Cell> neighbours = MCMoore(x,y);
+
+
+
+
+            int energyBefore = 0;
+            for(Cell cc:neighbours){
+                if(shot.getState()!=cc.getState()){
+                    energyBefore ++;
+                }
+            }
+            //losuje jedną z komórek z listy sąsiadów
+            int energyAfter = 0;
+            int choice = r.nextInt(neighbours.size());
+
+            int x_new = neighbours.get(choice).getX();
+            int y_new = neighbours.get(choice).getY();
+            Cell newShot = matrix[x_new][y_new];
+            for(Cell cc:neighbours){
+                if(newShot.getState()!=cc.getState()){
+                    energyAfter ++;
+                }
+            }
+
+            int energyChange = energyAfter - energyBefore;
+
+
+            double prob ;
+            if(energyChange<= 0 ){
+                prob = 1;
+
+            }else{
+
+                prob = Math.exp(-(energyChange/(k*t)));
+
+            }
+
+            if(prob == 1) {
+                tempboard[x][y].setCellColor(newShot.getCellColor());
+                tempboard[x][y].setState(newShot.getState());
+
+            }
+
+            listAllCells.remove(find);
+
+        }
+
+
+        this.matrix = tempboard;
+
+    }
+
+    /////////////////////////////////////////////////////////////////
     public boolean isOver(){
         int c = 0;
         for(int i = 1; i <(height -2); i++){
@@ -552,7 +666,7 @@ public class CA {
     }
 
     public javafx.scene.paint.Color getColor(int x, int y){
-       return this.matrix[x][y].getCellColor();
+        return this.matrix[x][y].getCellColor();
     }
 
     public javafx.scene.paint.Color generateColor(){
@@ -563,13 +677,14 @@ public class CA {
         Color color = Color.rgb(R, G, B);
         return color;
     }
-    public void setCAState(double x, double y){
-        this.matrix[(int) y][(int) x].setState(1);
-        matrix[(int)y][(int) x].setCellColor(generateColor());
-    }
 
     public void setColor(int x, int y ,Color c){
         matrix[x][y].setCellColor(c);
+    }
+
+    public void setCAState(double x, double y){
+        this.matrix[(int) y][(int) x].setState(1);
+        matrix[(int)y][(int) x].setCellColor(generateColor());
     }
     public void setMatrix(Cell[][] m){
         this.matrix = m;
@@ -588,6 +703,21 @@ public class CA {
 
     public void setHeight(int height) {
         this.height = height;
+    }
+
+    void print(){
+        for(int i = 0; i < height; i++){
+            for(int j = 0; j < width; j++){
+
+                System.out.print(matrix[i][j].getState() + " ");
+
+            }
+            System.out.println();
+        }
+
+
+
+
     }
 
     int getState(int y, int x){

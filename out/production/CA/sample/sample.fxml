@@ -9,9 +9,9 @@
    <children>
       <Pane fx:id="Pane" prefHeight="768.0" prefWidth="753.0">
          <children>
-            <ChoiceBox fx:id="BC" layoutX="14.0" layoutY="31.0" prefWidth="150.0" />
+            <ChoiceBox fx:id="BC" layoutX="14.0" layoutY="19.0" prefWidth="150.0" />
             <ChoiceBox fx:id="type" layoutX="185.0" layoutY="31.0" prefWidth="150.0" />
-            <Label layoutX="37.0" layoutY="14.0" text="Boundary condition" />
+            <Label layoutX="37.0" layoutY="5.0" text="Boundary condition" />
             <Label layoutX="247.0" layoutY="14.0" text="Type" />
             <TextField fx:id="w" layoutX="362.0" layoutY="31.0" prefHeight="25.0" prefWidth="70.0" />
             <TextField fx:id="h" layoutX="362.0" layoutY="87.0" prefHeight="25.0" prefWidth="70.0" />
@@ -28,7 +28,7 @@
             <TextField fx:id="columnAmount" layoutX="535.0" layoutY="43.0" prefHeight="25.0" prefWidth="53.0" text="10" />
             <TextField fx:id="radius" layoutX="493.0" layoutY="87.0" prefHeight="25.0" prefWidth="70.0" text="5" />
             <Label layoutX="517.0" layoutY="66.0" text="Radius" />
-            <Button fx:id="start" layoutX="343.0" layoutY="131.0" mnemonicParsing="false" onAction="#begin" prefHeight="25.0" prefWidth="238.0" text="Start" />
+            <Button fx:id="start" layoutX="535.0" layoutY="131.0" mnemonicParsing="false" onAction="#begin" prefHeight="25.0" prefWidth="70.0" text="Start" />
             <TextField fx:id="amount" layoutX="524.0" layoutY="1.0" prefHeight="25.0" prefWidth="64.0" />
             <ScrollPane fx:id="scroll" layoutX="6.0" layoutY="171.0" prefHeight="419.0" prefWidth="603.0">
                <content>
@@ -37,10 +37,13 @@
             </ScrollPane>
             <ChoiceBox fx:id="squareSize" layoutX="260.0" layoutY="87.0" prefHeight="25.0" prefWidth="70.0" />
             <Label layoutX="281.0" layoutY="66.0" text="Size" />
-            <ChoiceBox fx:id="neighbourhood" layoutX="14.0" layoutY="87.0" prefWidth="150.0" />
-            <Label layoutX="47.0" layoutY="66.0" text="Neighbourhood" />
-            <Button fx:id="step" layoutX="25.0" layoutY="131.0" mnemonicParsing="false" onAction="#StartGrowth" text="One step" />
-            <Button fx:id="Allgrowth" layoutX="172.0" layoutY="131.0" mnemonicParsing="false" onAction="#Growth" prefHeight="25.0" prefWidth="85.0" text="Growth" />
+            <ChoiceBox fx:id="neighbourhood" layoutX="14.0" layoutY="62.0" prefWidth="150.0" />
+            <Label layoutX="46.0" layoutY="48.0" text="Neighbourhood" />
+            <Button fx:id="step" layoutX="46.0" layoutY="100.0" mnemonicParsing="false" onAction="#StartGrowth" text="One step" />
+            <Button fx:id="Allgrowth" layoutX="35.0" layoutY="134.0" mnemonicParsing="false" onAction="#Growth" prefHeight="17.0" prefWidth="85.0" text="Growth" />
+            <Button fx:id="monteCarlo" layoutX="156.0" layoutY="134.0" mnemonicParsing="false" onAction="#createMC" text="Monte Carlo" />
+            <Button fx:id="stopMC" layoutX="151.0" layoutY="100.0" mnemonicParsing="false" onAction="#stopMC" prefHeight="25.0" prefWidth="92.0" text="MC one step" />
+            <TextField fx:id="MCcounter" layoutX="249.0" layoutY="134.0" prefHeight="25.0" prefWidth="64.0" />
          </children>
       </Pane>
    </children>

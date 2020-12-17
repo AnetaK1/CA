@@ -8,6 +8,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -47,14 +48,18 @@ public class Controller implements Initializable {
     public ChoiceBox neighbourhood;
     public Button Allgrowth;
     public Button step;
+    public Button monteCarlo;
+    public TextField MCcounter;
+    public Button stopMC;
     AnimationTimer animationTimer;
+    AnimationTimer monteCarloAnimation;
 
     // int size;//wielkość jednej komórki
     GraphicsContext gc;
     Random r;
     double k;
     int height, width;
-
+    int c=0;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -71,10 +76,10 @@ public class Controller implements Initializable {
         neighbourhood.setItems(FXCollections.observableArrayList(
                 vonNeumann, Moore, PentagonalDown, PentagonalLeft, PentagonalRandom, PentagonalRight,
                 PentagonalUp, HeksagonalLeft, HeksagonalRight, HeksagonalRandom));
-        neighbourhood.setValue(Moore);
+        neighbourhood.setValue(PentagonalRandom);
         w.setText("250");
         h.setText("200");
-        amount.setText("12");
+        amount.setText("1200");
 
         height = Integer.parseInt(h.getText())*(int) squareSize.getValue();
         width = Integer.parseInt(w.getText())*(int) squareSize.getValue();
@@ -85,10 +90,18 @@ public class Controller implements Initializable {
         Pane.setPrefWidth(gridPane.getPrefWidth());
 
         Pane.setPrefHeight(gridPane.getPrefHeight());
+        MCcounter.setEditable(false);
+        monteCarlo.setDisable(true);
+        stopMC.setDisable(true);
+
+
 
         animationTimer = new AnimationTimer() {
             @Override
             public void handle(long l) {
+
+                monteCarlo.setDisable(true);
+                stopMC.setDisable(true);
 
                 simulation((Neighbourhood) neighbourhood.getValue());
 
@@ -99,10 +112,26 @@ public class Controller implements Initializable {
                     e.printStackTrace();
                 }
 
-                if(automat.isOver()) stop();
+                if(automat.isOver()) {
+                    stop();
+                    monteCarlo.setDisable(false);
+                    stopMC.setDisable(false);
+                };
             }
         };
 
+        monteCarloAnimation = new AnimationTimer() {
+
+            @Override
+            public void handle(long l) {
+
+                automat.MonteCarlo();
+                draw(gc);
+                c++;
+                MCcounter.setText(String.valueOf(c));
+
+            }
+        };
 
 
     }
@@ -125,12 +154,19 @@ public class Controller implements Initializable {
             draw(gc);
         } else if (withRadius.equals(t)) {
 
-            automat.buildWithRadius(Integer.parseInt(amount.getText()),Integer.parseInt(radius.getText()));
-            setBC(b);
-            draw(gc);
+            if(Integer.parseInt(radius.getText()) >= Integer.parseInt(h.getText()) || Integer.parseInt(radius.getText()) >= Integer.parseInt(w.getText())){
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setHeaderText("Error");
+                errorAlert.setContentText("Radius is too big");
+                errorAlert.showAndWait();
 
-        } else if (random.equals(t) && Integer.parseInt(amount.getText())>0 &&
-                Integer.parseInt(amount.getText()) < ((width *height)/((int) squareSize.getValue() *100))) {
+            }else{
+                int r = Integer.parseInt(radius.getText());
+                automat.buildWithRadius(Integer.parseInt(amount.getText()),r);
+                setBC(b);
+                draw(gc);}
+
+        } else if (random.equals(t) && Integer.parseInt(amount.getText())>0) {
 
             //sprawdzam by zajęte było max 1/100 przestrzeni
 
@@ -167,8 +203,8 @@ public class Controller implements Initializable {
     public void simulation(Neighbourhood n){
 
 
-                automat.simulation(n, (BoundaryCondition) BC.getValue());
-                draw(gc);
+        automat.simulation(n, (BoundaryCondition) BC.getValue());
+        draw(gc);
 
 
     }
@@ -176,6 +212,11 @@ public class Controller implements Initializable {
 
         if(limitSpace()) {
 
+            monteCarloAnimation.stop();
+            monteCarlo.setDisable(true);
+            stopMC.setDisable(true);
+            c=0;
+            MCcounter.setText(String.valueOf(c));
             height = Integer.parseInt(h.getText())*(int) squareSize.getValue();
             width = Integer.parseInt(w.getText())*(int) squareSize.getValue();
             matrix.setHeight(height);
@@ -214,18 +255,7 @@ public class Controller implements Initializable {
             }
         }
 
-//        //creating grid on board
-//        // vertical lines
-//        g.setStroke(Color.GRAY);
-//        for(int i = 1 ; i <= matrix.getWidth() ; i+=(int) squareSize.getValue()){
-//            g.strokeLine(i, 1, i, matrix.getHeight() );
-//        }
-//
-//        // horizontal lines
-//        g.setStroke(Color.GRAY);
-//        for(int i = 1 ; i <= matrix.getHeight() ; i+=(int) squareSize.getValue()){
-//            g.strokeLine(1, i, matrix.getWidth(), i);
-//        }
+
 
 
 
@@ -234,7 +264,7 @@ public class Controller implements Initializable {
 
     public boolean limitSpace(){
         if(Integer.parseInt(w.getText()) >= 10 && Integer.parseInt(h.getText()) >= 10
-        && Integer.parseInt(w.getText()) <=1000 && Integer.parseInt(h.getText()) <= 1000 ) return true;
+                && Integer.parseInt(w.getText()) <=1000 && Integer.parseInt(h.getText()) <= 1000 ) return true;
         else return false;
     }
 
@@ -249,5 +279,23 @@ public class Controller implements Initializable {
     public void Growth(ActionEvent actionEvent) {
 
         animationTimer.start();
+    }
+
+    public void createMC(ActionEvent actionEvent) {
+
+        monteCarloAnimation.start();
+
+    }
+
+
+    public void stopMC(ActionEvent actionEvent) {
+
+
+        monteCarloAnimation.stop();
+        c++;
+        MCcounter.setText(String.valueOf(c));
+        automat.MonteCarlo();
+        draw(gc);
+
     }
 }
