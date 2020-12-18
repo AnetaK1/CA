@@ -67,19 +67,19 @@ public class Controller implements Initializable {
 
         BC.setItems(FXCollections.observableArrayList(
                 periodic, absorbic));
-        BC.setValue(absorbic);
+        BC.setValue(periodic);
         type.setItems(FXCollections.observableArrayList(
                 homogeneous, withRadius,random, clicking));
         type.setValue(random);
         squareSize.setItems(FXCollections.observableArrayList(1,2,4,10));
-        squareSize.setValue(2);
+        squareSize.setValue(4);
         neighbourhood.setItems(FXCollections.observableArrayList(
                 vonNeumann, Moore, PentagonalDown, PentagonalLeft, PentagonalRandom, PentagonalRight,
                 PentagonalUp, HeksagonalLeft, HeksagonalRight, HeksagonalRandom));
         neighbourhood.setValue(PentagonalRandom);
-        w.setText("250");
-        h.setText("200");
-        amount.setText("1200");
+        w.setText("100");
+        h.setText("70");
+        amount.setText("22");
 
         height = Integer.parseInt(h.getText())*(int) squareSize.getValue();
         width = Integer.parseInt(w.getText())*(int) squareSize.getValue();
@@ -149,9 +149,11 @@ public class Controller implements Initializable {
             //sprawdzam by w w r i c nie było ciągiem komórek mają być przerwy
             //sprawdzam by dlugosc byla podzielna przez ilosc
 
-            setBC(b);
+
             automat.buildHomogenous( Integer.parseInt(columnAmount.getText()),Integer.parseInt(rowAmount.getText()));
+            setBC(b);
             draw(gc);
+
         } else if (withRadius.equals(t)) {
 
             if(Integer.parseInt(radius.getText()) >= Integer.parseInt(h.getText()) || Integer.parseInt(radius.getText()) >= Integer.parseInt(w.getText())){
@@ -174,7 +176,7 @@ public class Controller implements Initializable {
             setBC(b);
             draw(gc);
         } else if (clicking.equals(t)) {
-            setBC(b);
+
             matrix.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
@@ -183,7 +185,7 @@ public class Controller implements Initializable {
                     int y = (int) event.getY()+1;
 
                     automat.setCAState(x/(int) squareSize.getValue(),y/(int) squareSize.getValue());
-
+                    setBC(b);
                     draw(gc);
                 }
             });
@@ -201,13 +203,10 @@ public class Controller implements Initializable {
     }
 
     public void simulation(Neighbourhood n){
-
-
         automat.simulation(n, (BoundaryCondition) BC.getValue());
         draw(gc);
-
-
     }
+
     public void begin(ActionEvent actionEvent) {
 
         if(limitSpace()) {
@@ -222,14 +221,8 @@ public class Controller implements Initializable {
             matrix.setHeight(height);
             matrix.setWidth((width));
             automat = new CA((int)matrix.getWidth()/(int) squareSize.getValue(),(int) matrix.getHeight()/(int) squareSize.getValue());
-
-
-
-
             Pane.setPrefWidth(gridPane.getPrefWidth());
             Pane.setPrefHeight(gridPane.getPrefHeight());
-
-
             build(type.getValue(), BC.getValue());
 
         }
@@ -239,12 +232,9 @@ public class Controller implements Initializable {
     public void draw(GraphicsContext g){
 
         g.setFill(Color.WHITE);
-        g.fillRect( (int)squareSize.getValue(), (int) squareSize.getValue(), matrix.getWidth(), matrix.getHeight());
-
-
-
-        for (int y =1; y < ((matrix.getHeight()/(int) squareSize.getValue())); y++) {
-            for (int x = 1; x <(( matrix.getWidth()/(int) squareSize.getValue())); x++) {
+        g.fillRect( 0, 0, matrix.getWidth(), matrix.getHeight());
+        for (int y =0; y < automat.getHeight(); y++) {
+            for (int x = 0; x <automat.getWidth(); x++) {
                 if (this.automat.getState(y, x) != 0) {
 
                     g.setFill(automat.getColor(y, x));
@@ -254,10 +244,6 @@ public class Controller implements Initializable {
                 }
             }
         }
-
-
-
-
 
     }
 
@@ -273,6 +259,11 @@ public class Controller implements Initializable {
 
         animationTimer.stop();
         simulation((Neighbourhood) neighbourhood.getValue());
+        if(automat.isOver()) {
+            animationTimer.stop();
+            monteCarlo.setDisable(false);
+            stopMC.setDisable(false);
+        };
 
     }
 
@@ -289,8 +280,6 @@ public class Controller implements Initializable {
 
 
     public void stopMC(ActionEvent actionEvent) {
-
-
         monteCarloAnimation.stop();
         c++;
         MCcounter.setText(String.valueOf(c));

@@ -15,7 +15,7 @@ public class CA {
     private int width;
     private int height;
     private Cell[][] matrix;
-    Random r = new Random();
+    Random r;
     boolean choiceHeksa;
     int choicePenta ;
     final double k = 0.1;
@@ -25,9 +25,9 @@ public class CA {
     public CA() {
         width = 10;
         height = 10;
-        matrix = new Cell[height + 2][width +2 ];
-        for(int i = 0; i < (width-1); i++){
-            for(int j = 0; j < (height-1); j++){
+        matrix = new Cell[height][width ];
+        for(int i = 0; i < (width); i++){
+            for(int j = 0; j < (height); j++){
                 matrix[i][j] = new Cell();
                 matrix[i][j].setPosition(i,j);
                 matrix[i][j].setState(0);
@@ -38,8 +38,8 @@ public class CA {
     }
 
     public CA(int width, int height){
-        this.width = (width + 2);
-        this.height = (height + 2);
+        this.width = width;
+        this.height = height;
         r = new Random();
 
         matrix = new Cell[this.height][this.width];
@@ -58,18 +58,17 @@ public class CA {
     void buildHomogenous(int ca, int ra){
         int h = this.height;
         int w = this.width;
-        int r =  ((h-1) / (ra ));
-        int c =  (((w-1) / (ca )));
+        int r =  ((h) / (ra ));
+        int c =  (((w) / (ca )));
 
         int k = 1;
 
-        for(int i = r-2; i <=(r*ra); i+=(r)){
-            for(int j = c-2; j <=(c*ca) ; j+=(c)){
+        for(int i = r-1; i <(r*ra); i+=(r)){
+            for(int j = c-1; j <(c*ca) ; j+=(c)){
 
                 matrix[i][j].setState(k);
-                k++;
-
                 matrix[i][j].setCellColor(generateColor());
+                k++;
             }
         }
 
@@ -88,14 +87,14 @@ public class CA {
         //    System.out.println(possibleAmount);
 
         while (l <= amount && l<=possibleAmount) {
-            int x = (r.nextInt(height-2 )+1);
-            int y = (r.nextInt(width-2)+1);
+            int x = (r.nextInt(height-1 )+1);
+            int y = (r.nextInt(width-1)+1);
 
             //  System.out.println("Y: "+x+"\nX: "+y);
 
 
-            for (int i = 1; i < height-1; i++) {
-                for (int j = 1; j < width-1; j++) {
+            for (int i = 1; i < height; i++) {
+                for (int j = 1; j < width; j++) {
                     double dist =matrix[x][y].getDistance(i,j);
                     if(dist < radius && matrix[i][j].getState()!=0){
                         can = false;
@@ -120,17 +119,10 @@ public class CA {
     void buildRandom(int amount){
 
         for(int i = 1; i < amount + 1; i++){
-
-            int x = (r.nextInt(height-2)+1);
-            int y = (r.nextInt(width-2)+1);
-
+            int x = (r.nextInt(height-1)+1);
+            int y = (r.nextInt(width-1)+1);
             matrix[x][y].setState(i);
-
-            Color c = generateColor();
-
-
-            matrix[x][y].setCellColor(c);
-
+            matrix[x][y].setCellColor(generateColor());
         }
     }
 
@@ -141,18 +133,18 @@ public class CA {
         for(int i = 0; i < (height); i++){
             for(int j = 0; j < (width); j++){
 
-                if( i == 0 && j > 0 && j < (width-2)){
+                if( i == 0 && j > 0 && j < (width-1)){
                     matrix[i][j] = matrix[height-2][j];
                 }
 
-                if(i == (height-1) && j > 0 && j < (width-2)){
+                if(i == (height-1) && j > 0 && j < (width-1)){
                     matrix[i][j] = matrix[1][j];
                 }
 
-                if(j == 0 && i>0 && i <(height-2)){
+                if(j == 0 && i>0 && i <(height-1)){
                     matrix[i][j] = matrix[i][width -2];
                 }
-                if(j == (width-1) && i>0 && i <(height-2)){
+                if(j == (width-1) && i>0 && i <(height-1)){
                     matrix[i][j] = matrix[i][1];
                 }
 
@@ -160,7 +152,7 @@ public class CA {
             }
         }
 
-        matrix[0][0] = matrix[height - 2][width -2];
+        matrix[1][1] = matrix[height - 2][width -2];
         matrix[0][width-1] = matrix[height -2][1];
         matrix[height-1][0] = matrix[1][width-2];
         matrix[height-1][width-1] = matrix[1][1];
@@ -172,10 +164,10 @@ public class CA {
         for(int i = 0; i <=(height -1); i++){
             for(int j = 0; j <=(width-1); j++){
 
-                if(i == 0) matrix[i][j].setState(0);
-                if(i == (height -1)) matrix[i][j].setState(0);
-                if(j == 0) matrix[i][j].setState(0);
-                if(j == (width-1)) matrix[i][j].setState(0);
+                if(i == 0) matrix[i][j].setState(matrix[i][j].getState());
+                if(i == (height -1)) matrix[i][j].setState(matrix[i][j].getState());
+                if(j == 0) matrix[i][j].setState(matrix[i][j].getState());
+                if(j == (width-1)) matrix[i][j].setState(matrix[i][j].getState());
 
 
 
@@ -190,9 +182,7 @@ public class CA {
     public Cell findMaxCell(List<Cell> neighbours){
         if(neighbours.isEmpty()) return new Cell();
         else{
-
             Cell max = new Cell();
-
             //zliczanie ile jest id takich samych
             Map<Integer, Integer> mapa = new HashMap<>();
             for(Cell cc :neighbours){
@@ -204,10 +194,8 @@ public class CA {
                 }
 
             }
-
             //szukanie najczęściej występującego id
             Map.Entry<Integer, Integer> maxEntry = null;
-
             for(Map.Entry<Integer, Integer> entry:mapa.entrySet()){
                 if(maxEntry == null || entry.getValue() >= maxEntry.getValue()){
                     if(maxEntry != null && entry.getValue() == maxEntry.getValue()){
@@ -217,13 +205,9 @@ public class CA {
                             maxEntry = entry;
                         }
                         else continue;
-
                     }else {
                         maxEntry = entry;
                     }
-
-
-
                 }
             }
 
@@ -278,8 +262,6 @@ public class CA {
         if((x+1)<height && matrix[x+1][y].getState()!=0) neighbours.add(new Cell(matrix[x+1][y].getState(),x+1,y,matrix[x+1][y].getCellColor()));
         if((y-1)>=0 && matrix[x][y-1].getState()!=0) neighbours.add(new Cell(matrix[x][y-1].getState(),x,y-1,matrix[x][y-1].getCellColor()));
         if((y+1)<width && matrix[x][y+1].getState()!=0) neighbours.add(new Cell(matrix[x][y+1].getState(),x,y+1,matrix[x][y+1].getCellColor()));
-
-
         return neighbours;
     }
 
@@ -387,32 +369,23 @@ public class CA {
     //penatgonalne losowe
     public List<Cell> pentagonalRandom(int x, int y){
         List<Cell> neighbours = new ArrayList<>();
-
-        //int choicePenta = r.nextInt(4);
-        //  System.out.println(choicePenta);
-
         switch (choicePenta){
             case 0:
                 neighbours = pentagonalDown(x,y);
-                // System.out.println(PentagonalDown);
                 break;
             case 1:
                 neighbours = pentagonalLeft(x, y);
-                // System.out.println(PentagonalLeft);
                 break;
             case 2:
                 neighbours = pentagonalRight(x,y);
-                //  System.out.println(PentagonalRight);
                 break;
             case 3:
                 neighbours = pentagonalUp(x,y);
-                // System.out.println(PentagonalUp);
                 break;
             default:
                 System.out.println("Wrong choice!!!");
 
         }
-
         return neighbours;
     }
     //--------------------------------------------------//
@@ -437,8 +410,6 @@ public class CA {
 
             }
         }
-
-
         return neighbours;
     }
 
@@ -459,8 +430,6 @@ public class CA {
                 if((j == y+1 && i == x-1) || (j == y-1 && i == x+1)) continue;
                 if(matrix[i][j].getState() != 0){
                     neighbours.add(matrix[i][j]);
-//                    neighbours.add(new Cell(matrix[i][j].getState(), matrix[i][j].getX(),
-//                            matrix[i][j].getY(), matrix[i][j].getCellColor()));
                 }
 
             }
@@ -474,13 +443,9 @@ public class CA {
     //heksagonalne losowe
     public List<Cell> heksagonalRandom(int x, int y){
         List<Cell> neighbours = new ArrayList<>();
-
-        // boolean choiceHeksa = r.nextBoolean();
         if(choiceHeksa){
-            //System.out.println(HeksagonalRight);
             neighbours = hekasgonalRight(x,y);}
         else {
-            // System.out.println(HeksagonalLeft);
             neighbours = heksagonalLeft(x, y);
         }
 
@@ -653,8 +618,8 @@ public class CA {
     /////////////////////////////////////////////////////////////////
     public boolean isOver(){
         int c = 0;
-        for(int i = 1; i <(height -2); i++){
-            for(int j = 1; j <(width-2); j++){
+        for(int i = 1; i <(height); i++){
+            for(int j = 1; j <(width); j++){
 
                 if(matrix[i][j].getState() == 0) c++;
 
